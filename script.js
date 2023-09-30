@@ -1,5 +1,8 @@
 // JavaScript game logic goes here
 
+// Initialize Socket.io and connect to the server
+const socket = io();
+
 // Initialize the game constants
 const WIDTH = 800;
 const HEIGHT = 600;
@@ -107,6 +110,9 @@ function gameLoop() {
         event.preventDefault();
     }
 
+    // Send player movements to the server
+    socket.emit('move', { direction: playerDirection });
+
     // Move the player snake
     let newHead = { x: playerSnake[0].x + playerDirection.x, y: playerSnake[0].y + playerDirection.y };
 
@@ -187,6 +193,11 @@ function gameLoop() {
     // Limit the frame rate
     setTimeout(gameLoop, 1000 / SNAKE_SPEED);
 }
+
+// Listen for server movements and update the enemy snake's direction
+socket.on('move', (data) => {
+    enemyDirection = data.direction;
+});
 
 // Start the game loop
 gameLoop();
