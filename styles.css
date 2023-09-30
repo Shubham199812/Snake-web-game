@@ -1,0 +1,12 @@
+/* Define your CSS styles here */
+body {
+    font-family: Arial, sans-serif;
+    background-color: black;
+    margin: 0;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+}
