@@ -31,6 +31,9 @@ let enemyHasEaten = false;
 let playerFood = { x: Math.floor(Math.random() * (WIDTH / GRID_SIZE)) * GRID_SIZE, y: Math.floor(Math.random() * (HEIGHT / GRID_SIZE)) * GRID_SIZE };
 let enemyFood = { x: Math.floor(Math.random() * (WIDTH / GRID_SIZE)) * GRID_SIZE, y: Math.floor(Math.random() * (HEIGHT / GRID_SIZE)) * GRID_SIZE };
 
+// Touch screen controls
+let touchStartX, touchStartY;
+
 // Game loop
 let running = true;
 function gameLoop() {
@@ -61,23 +64,48 @@ function gameLoop() {
         }
     });
 
-    // Handle user input for the enemy snake (using WASD keys)
-    document.addEventListener('keydown', (event) => {
-        switch (event.key) {
-            case 'a':
-                enemyDirection = { x: -GRID_SIZE, y: 0 };
-                break;
-            case 'd':
-                enemyDirection = { x: GRID_SIZE, y: 0 };
-                break;
-            case 'w':
-                enemyDirection = { x: 0, y: -GRID_SIZE };
-                break;
-            case 's':
-                enemyDirection = { x: 0, y: GRID_SIZE };
-                break;
-        }
+    // Handle touch events for the player snake
+    canvas.addEventListener('touchstart', (event) => {
+        const touch = event.touches[0];
+        handleTouchStart(touch);
     });
+
+    canvas.addEventListener('touchmove', (event) => {
+        const touch = event.touches[0];
+        handleTouchMove(touch);
+    });
+
+    function handleTouchStart(touch) {
+        // Store the initial touch coordinates
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+    }
+
+    function handleTouchMove(touch) {
+        // Calculate the change in touch coordinates
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touch.clientY - touchStartY;
+
+        // Determine the direction based on the change in coordinates
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal swipe
+            if (deltaX > 0) {
+                playerDirection = { x: GRID_SIZE, y: 0 }; // Right
+            } else {
+                playerDirection = { x: -GRID_SIZE, y: 0 }; // Left
+            }
+        } else {
+            // Vertical swipe
+            if (deltaY > 0) {
+                playerDirection = { x: 0, y: GRID_SIZE }; // Down
+            } else {
+                playerDirection = { x: 0, y: -GRID_SIZE }; // Up
+            }
+        }
+
+        // Prevent scrolling the page while swiping
+        event.preventDefault();
+    }
 
     // Move the player snake
     let newHead = { x: playerSnake[0].x + playerDirection.x, y: playerSnake[0].y + playerDirection.y };
